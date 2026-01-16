@@ -1,0 +1,53 @@
+#DNS for each pod - podname.servicename.namespace.svc.cluster.local
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+ name: mysql
+ namespace: mysql-ha
+spec:
+ selector:
+   matchLabels:
+     app: mysql
+ serviceName: mysql
+ replicas: 3
+ podManagementPolicy: OrderedReady
+ template:
+   metadata:
+     labels:
+       app: mysql
+   spec:
+     terminationGracePeriodSeconds: 10
+     affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - mysql
+          topologyKey: "kubernetes.io/hostname"
+     containers:
+     - name: mysql
+       image: mysql:8
+       ports:
+       - containerPort: 3306
+         name: mysql
+       env:
+       - name: MYSQL_ROOT_PASSWORD
+         value: "rootpassword"
+       - name: MYSQL_DATABASE
+         value: "todo_db"
+       volumeMounts:
+       - mountPath: /var/lib/mysql
+         name: todo-volume
+ volumeClaimTemplates:
+ - metadata:
+     name: todo-volume
+   spec:
+     storageClassName: auto-ebs-sc
+     accessModes: [ "ReadWriteOnce" ]
+     resources:
+       requests:
+         storage: 5Gi
