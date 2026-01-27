@@ -1,0 +1,23 @@
+#Container is ready for the first 30 secs, then it becomes unhealthy. After 5 secs of initial delay, the liveness probe checks every 5 secs if the file /tmp/healthy exists. Once the file is deleted after 30 secs, the liveness probe will fail and the container will be restarted.      
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-exec
+spec:
+  containers:
+  - name: liveness
+    image: registry.k8s.io/busybox:1.27.2
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
