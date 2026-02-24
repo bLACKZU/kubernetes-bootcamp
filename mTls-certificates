@@ -25,3 +25,12 @@ It uses asymmetric mTLS. The API server is relying on RBAC node authorization an
 Client - API server(Cert Path-/etc/kubernetes/pki/apiserver-kubelet-client.crt, CA-kubernetes)
 Certificate Trust location - /etc/kubernetes/pki/ca.crt (inside /var/lib/kubelet/config.yaml)
 Certificate Trust location - /etc/kubernetes/pki/apiserver-kubelet-client.crt(api server yaml)
+
+Scenario 5
+Server - API Server(Cert Path-/etc/kubernetes/pki/apiserver.crt, CA-kubernetes)
+Client - kube-proxy(Bearer Token from /var/lib/kube-proxy/kubeconfig.conf, NOT a client certificate)
+*Important: kube-proxy uses token-based authentication (JWT service account token), NOT certificate-based client authentication
+*This is ONE-WAY mTLS: kube-proxy verifies the API server's certificate, but the API server does NOT verify a kube-proxy client certificate
+*kube-proxy authenticates using a bearer token stored in the kubeconfig, which is then validated by the API server's RBAC policies
+Client Certificate Trust location - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt (kube-proxy uses this to verify API server cert)
+Server Certificate Trust location - /etc/kubernetes/pki/ca.crt (api server yaml - though API server authenticates client via token, not cert)
