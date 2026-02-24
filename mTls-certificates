@@ -1,0 +1,27 @@
+Scenario 1 
+Server - API Server(Cert path-/etc/kubernetes/pki/, CA-	kubernetes)
+Client - scheduler(Cert path-/etc/kubernetes/scheduler.conf, CA-kubernetes)
+Certificate Trust location - /etc/kubernetes/pki/ca.crt(api server yaml)
+Certificate Trust location - /etc/kubernetes/scheduler.conf(scheduler yaml)
+
+Scenario 2
+Server - API Server(Cert path-/etc/kubernetes/pki/, CA-kubernetes)
+Client - controller manager(Cert path-/etc/kubernetes/controller-manager.conf, CA-kubernetes)
+Certificate Trust location - /etc/kubernetes/pki/ca.crt(api server yaml)
+Certificate Trust location - /etc/kubernetes/controller-manager.conf(controller manager yaml)
+
+Scenario 3
+Server - etcd(Cert path-/etc/kubernetes/pki/etcd, CA-etcd-ca)
+Client - API server(Cert path-/etc/kubernetes/pki/apiserver-etcd-client.crt, CA-etcd-ca)
+Certificate Trust location - /etc/kubernetes/pki/etcd/ca.crt(api server yaml)
+Certificate Trust location - /etc/kubernetes/pki/etcd/ca.crt(etcd yaml)
+
+Scenario 4
+Server - kubelet(Cert Path-/var/lib/kubelet/pki/kubelet.crt, CA-kind-control-plane-ca@1768746043)
+*Initially kubelet doesnt have a certificate, it uses a bootstrap token to authenticate to the API server and request a certificate. Once the API server approves the request, the kubelet receives a certificate and can use it for subsequent authentication.
+--enable-bootstrap-token-auth=true
+How is API server verifying the kubelet's certificate?
+It uses asymmetric mTLS. The API server is relying on RBAC node authorization and node restriction admission controller to ensure that the kubelet is only able to access resources that are relevant to its node. The API server verifies the kubelet's certificate by checking if it is signed by a trusted CA and if it has the appropriate permissions based on RBAC rules.
+Client - API server(Cert Path-/etc/kubernetes/pki/apiserver-kubelet-client.crt, CA-kubernetes)
+Certificate Trust location - /etc/kubernetes/pki/ca.crt (inside /var/lib/kubelet/config.yaml)
+Certificate Trust location - /etc/kubernetes/pki/apiserver-kubelet-client.crt(api server yaml)
