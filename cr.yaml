@@ -1,0 +1,8 @@
+apiVersion: ops.zutech.com/v1
+kind: BackupPolicy
+metadata:
+  name: daily-backup 
+spec:
+  schedule: "0 0 * * *" 
+  retentionDays: 7
+  targetPVC: "my-app-pvc"
