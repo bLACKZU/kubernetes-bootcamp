@@ -1,0 +1,14 @@
+apiVersion: kube-green.com/v1alpha1
+kind: SleepInfo
+metadata:
+  name: sleep-info-sample
+spec:
+  includeRef:
+    - apiVersion: apps/v1
+      kind: Deployment
+      matchLabels:
+        app: nginx
+  sleepAt: '14:37'
+  timeZone: 'Asia/Kolkata'
+  suspendCronJobs: true
+  weekdays: 0-6
