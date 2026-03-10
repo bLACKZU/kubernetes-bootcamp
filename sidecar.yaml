@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod-sc
+  labels:
+    app.kubernetes.io/name: MyApp
+spec:
+  restartPolicy: Never
+  containers:
+  - name: main-container
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+  - name: sidecar-health-logger
+    image: curlimages/curl:latest
+    command:
+    - sh
+    - -c 
+    - |
+      echo "Checking if app is up..."
+      while true; do
+        curl -s http://localhost:80 > /dev/null && echo "App is up at $(date)" || echo "App is down at $(date)"
+        sleep 5
+      done
